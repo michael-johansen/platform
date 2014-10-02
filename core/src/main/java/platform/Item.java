@@ -1,4 +1,4 @@
-package no.platform;
+package platform;
 
 import java.util.HashMap;
 import java.util.Map;

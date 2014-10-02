@@ -1,9 +1,7 @@
-import no.platform.Item;
-import no.platform.Platform;
+import platform.Item;
+import platform.Platform;
 import org.junit.Before;
 import org.junit.Test;
-
-import java.util.Arrays;
 
 import static java.util.Arrays.asList;
 import static org.hamcrest.CoreMatchers.is;
