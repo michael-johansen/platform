@@ -1,7 +1,9 @@
-import platform.Item;
-import platform.Platform;
 import org.junit.Before;
 import org.junit.Test;
+import platform.Item;
+import platform.Platform;
+
+import java.util.Optional;
 
 import static java.util.Arrays.asList;
 import static org.hamcrest.CoreMatchers.is;
@@ -56,10 +58,23 @@ public class PropertyTest {
 
     @Test(expected = CallbackException.class)
     public void onRegisterHandlers() throws Exception {
-        platform.addOnTypeRegistered((Type)->{
+        platform.addOnTypeRegistered((Type) -> {
             throw new CallbackException();
         });
         createTypeAndItem("Person");
+    }
+
+    @Test
+    public void persistAndLoad() {
+        Item person = createTypeAndItem("Person", "firstName", "lastName").set("firstName", "Donald").set("lastName", "Duck");
+        person.save();
+
+        assertThat(person.getKey(), is(notNullValue()));
+        Optional<Item> loaded = platform.loadItem("Person", person.getKey());
+
+        assertThat(loaded.isPresent(), is(true));
+        assertThat(loaded.get().<String>get("firstName"), is(person.<String>get("firstName")));
+        assertThat(loaded.get().<String>get("lastName"), is(person.<String>get("lastName")));
     }
 
 
@@ -71,5 +86,6 @@ public class PropertyTest {
         return platform.createItem("Person");
     }
 
-    private static class CallbackException extends RuntimeException{}
+    private static class CallbackException extends RuntimeException {
+    }
 }

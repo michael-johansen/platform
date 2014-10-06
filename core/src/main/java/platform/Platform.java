@@ -1,9 +1,7 @@
 package platform;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
+import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 
 /**
@@ -14,6 +12,7 @@ import java.util.function.Consumer;
 public class Platform {
     private Map<String, Type> typePropertyMap = new HashMap<>();
     private List<Consumer<Type>> onTypeRegisteredHandlers = new ArrayList<>();
+    private Map<String, Map<String, Item>> itemStorage = new HashMap<>();
 
     public Platform.TypeBuilder addType(String name) {
         return new TypeBuilder(name);
@@ -23,7 +22,14 @@ public class Platform {
         if (!typePropertyMap.containsKey(name)) {
             throw new IllegalArgumentException("Item " + name + " is not defined");
         }
-        return new Item((propertyName, value) -> {
+        return new Item(
+                getPropertyAssignmentValidator(name),
+                (item) -> itemStorage.computeIfAbsent(name, (key) -> new HashMap<>()).put(item.getKey(), item)
+        );
+    }
+
+    private BiConsumer<String, Object> getPropertyAssignmentValidator(String name) {
+        return (propertyName, value) -> {
             if (typePropertyMap.containsKey(name)) {
                 Map<String, Class<?>> propertyMap = typePropertyMap.get(name).getPropertyClasses();
                 if (propertyMap.containsKey(propertyName)) {
@@ -45,11 +51,18 @@ public class Platform {
                     ));
                 }
             }
-        });
+        };
     }
 
     public void addOnTypeRegistered(Consumer<Type> consumer) {
         onTypeRegisteredHandlers.add(consumer);
+    }
+
+    public Optional<Item> loadItem(String typeName, String itemKey) {
+        return Optional.ofNullable(itemStorage.computeIfAbsent(
+                typeName,
+                (mapKey) -> new HashMap<>()).get(itemKey)
+        );
     }
 
     public class TypeBuilder {
