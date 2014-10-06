@@ -25,14 +25,14 @@ public class PropertyTest {
 
     @Test
     public void defineType() throws Exception {
-        Item person = createPerson("firstName", "lastName");
+        Item person = createTypeAndItem("Person", "firstName", "lastName");
         assertThat(person, is(notNullValue()));
         // assert PropertyInformation
     }
 
     @Test
     public void defineProperties() throws Exception {
-        Item person = createPerson("firstName", "lastName").set("firstName", "Donald").set("lastName", "Duck");
+        Item person = createTypeAndItem("Person", "firstName", "lastName").set("firstName", "Donald").set("lastName", "Duck");
 
         assertThat(person.get("firstName"), is("Donald"));
         assertThat(person.get("lastName"), is("Duck"));
@@ -40,12 +40,12 @@ public class PropertyTest {
 
     @Test(expected = IllegalArgumentException.class)
     public void validatePropertyValueTypeOnAssignment() throws Exception {
-        createPerson("firstName", "lastName").set("firstName", 18);
+        createTypeAndItem("Person", "firstName", "lastName").set("firstName", 18);
     }
 
     @Test(expected = IllegalArgumentException.class)
     public void cantAssignToUndefinedProperty() throws Exception {
-        createPerson("firstName", "lastName").set("age", 18);
+        createTypeAndItem("Person", "firstName", "lastName").set("age", 18);
     }
 
     @Test(expected = IllegalArgumentException.class)
@@ -59,13 +59,12 @@ public class PropertyTest {
         platform.addOnTypeRegistered((Type)->{
             throw new CallbackException();
         });
-        platform.addType("Person").register();
-
+        createTypeAndItem("Person");
     }
 
 
-    private Item createPerson(String... properties) {
-        Platform.TypeBuilder typeBuilder = platform.addType("Person");
+    private Item createTypeAndItem(String name, String... properties) {
+        Platform.TypeBuilder typeBuilder = platform.addType(name);
         asList(properties).forEach((property) -> typeBuilder.addProperty(property, String.class));
         typeBuilder.register();
 

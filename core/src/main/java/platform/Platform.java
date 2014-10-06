@@ -6,8 +6,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.function.Consumer;
 
-import static java.util.Collections.unmodifiableMap;
-
 /**
  * User: Michael Johansen
  * Date: 01.10.2014
@@ -81,15 +79,4 @@ public class Platform {
         }
     }
 
-    public static class Type {
-        private final Map<String, Class<?>> propertyClasses;
-
-        public Type(Map<String, Class<?>> propertyClasses) {
-            this.propertyClasses = unmodifiableMap(propertyClasses);
-        }
-
-        public Map<String, Class<?>> getPropertyClasses() {
-            return propertyClasses;
-        }
-    }
 }
