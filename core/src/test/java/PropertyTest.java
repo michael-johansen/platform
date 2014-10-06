@@ -54,6 +54,16 @@ public class PropertyTest {
         platform.createItem("Person");
     }
 
+    @Test(expected = CallbackException.class)
+    public void onRegisterHandlers() throws Exception {
+        platform.addOnTypeRegistered((Type)->{
+            throw new CallbackException();
+        });
+        platform.addType("Person").register();
+
+    }
+
+
     private Item createPerson(String... properties) {
         Platform.TypeBuilder typeBuilder = platform.addType("Person");
         asList(properties).forEach((property) -> typeBuilder.addProperty(property, String.class));
@@ -61,4 +71,6 @@ public class PropertyTest {
 
         return platform.createItem("Person");
     }
+
+    private static class CallbackException extends RuntimeException{}
 }

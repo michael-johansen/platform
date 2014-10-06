@@ -1,7 +1,10 @@
 package platform;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
+import java.util.function.Consumer;
 
 import static java.util.Collections.unmodifiableMap;
 
@@ -11,19 +14,20 @@ import static java.util.Collections.unmodifiableMap;
  * Time: 18:19
  */
 public class Platform {
-    private Map<String, Map<String, Class<?>>> typePropertyMap = new HashMap<>();
+    private Map<String, Type> typePropertyMap = new HashMap<>();
+    private List<Consumer<Type>> onTypeRegisteredHandlers = new ArrayList<>();
 
     public Platform.TypeBuilder addType(String name) {
         return new TypeBuilder(name);
     }
 
     public Item createItem(String name) {
-        if(!typePropertyMap.containsKey(name)){
-            throw new IllegalArgumentException("Item " + name +" is not defined");
+        if (!typePropertyMap.containsKey(name)) {
+            throw new IllegalArgumentException("Item " + name + " is not defined");
         }
         return new Item((propertyName, value) -> {
             if (typePropertyMap.containsKey(name)) {
-                Map<String, Class<?>> propertyMap = typePropertyMap.get(name);
+                Map<String, Class<?>> propertyMap = typePropertyMap.get(name).getPropertyClasses();
                 if (propertyMap.containsKey(propertyName)) {
                     Class<?> propertyClass = propertyMap.get(propertyName);
                     if (value != null && !propertyClass.isAssignableFrom(value.getClass())) {
@@ -36,7 +40,7 @@ public class Platform {
                         ));
                     }
                 } else {
-                    throw  new IllegalArgumentException(String.format(
+                    throw new IllegalArgumentException(String.format(
                             "Undefined property %s on type %s",
                             propertyName,
                             name
@@ -44,6 +48,10 @@ public class Platform {
                 }
             }
         });
+    }
+
+    public void addOnTypeRegistered(Consumer<Type> consumer) {
+        onTypeRegisteredHandlers.add(consumer);
     }
 
     public class TypeBuilder {
@@ -66,8 +74,22 @@ public class Platform {
         }
 
         public Platform register() {
-            typePropertyMap.put(name, unmodifiableMap(propertyTypes));
+            Type type = new Type(propertyTypes);
+            typePropertyMap.put(name, type);
+            Platform.this.onTypeRegisteredHandlers.forEach(handler -> handler.accept(type));
             return Platform.this;
+        }
+    }
+
+    public static class Type {
+        private final Map<String, Class<?>> propertyClasses;
+
+        public Type(Map<String, Class<?>> propertyClasses) {
+            this.propertyClasses = unmodifiableMap(propertyClasses);
+        }
+
+        public Map<String, Class<?>> getPropertyClasses() {
+            return propertyClasses;
         }
     }
 }
