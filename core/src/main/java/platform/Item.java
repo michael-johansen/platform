@@ -1,11 +1,9 @@
 package platform;
 
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Optional;
-import java.util.UUID;
+import java.util.*;
 import java.util.function.BiConsumer;
 import java.util.function.Consumer;
+import java.util.function.Function;
 
 /**
  * User: Michael Johansen
@@ -13,24 +11,28 @@ import java.util.function.Consumer;
  * Time: 18:22
  */
 public class Item {
+    public static final String TYPE = "_type";
+    public static final String KEY = "key";
     private Map<String, Object> propertyMap = new HashMap<>();
     private final BiConsumer<String, Object> propertyAssignmentValidator;
     private final Consumer<Item> saveHandler;
-    private final String key;
 
     public Item(BiConsumer<String, Object> propertyAssignmentValidator,
                 Consumer<Item> saveHandler,
-                String key
+                String key,
+                Type type
     ) {
         this.propertyAssignmentValidator = propertyAssignmentValidator;
         this.saveHandler = saveHandler;
-        this.key = key;
+        set(KEY, key);
+        set(TYPE, type);
     }
 
     public Item(BiConsumer<String, Object> propertyAssignmentValidator,
-                Consumer<Item> saveHandler
+                Consumer<Item> saveHandler,
+                Type type
     ) {
-        this(propertyAssignmentValidator, saveHandler, UUID.randomUUID().toString());
+        this(propertyAssignmentValidator, saveHandler, UUID.randomUUID().toString(), type);
     }
 
     public <T> Item set(String name, T value) {
@@ -43,12 +45,24 @@ public class Item {
     public <T> T get(String name) {
         return (T) propertyMap.get(name);
     }
-
-    public String getKey() {
-        return key;
+    public Map<String, ?> getProperties() {
+        return Collections.unmodifiableMap(propertyMap);
     }
 
-    public void save() {
+    public String getKey() {
+        return get(KEY);
+    }
+
+    public Type getType() {
+        return get(TYPE);
+    }
+
+    public String getTypeName() {
+        return getType().getName();
+    }
+
+    public Item save() {
         saveHandler.accept(this);
+        return this;
     }
 }

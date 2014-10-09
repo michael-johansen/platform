@@ -3,7 +3,12 @@ import org.junit.Test;
 import platform.Item;
 import platform.Platform;
 
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Optional;
+import java.util.function.BiFunction;
+import java.util.function.Function;
+import java.util.stream.IntStream;
 
 import static java.util.Arrays.asList;
 import static org.hamcrest.CoreMatchers.is;
@@ -77,6 +82,11 @@ public class PropertyTest {
         assertThat(loaded.get().<String>get("lastName"), is(person.<String>get("lastName")));
     }
 
+    @Test(expected = IllegalArgumentException.class)
+    public void failsOnDuplicateRegistration() throws Exception {
+        createTypeAndItem("Person");
+        createTypeAndItem("Person");
+    }
 
     private Item createTypeAndItem(String name, String... properties) {
         Platform.TypeBuilder typeBuilder = platform.addType(name);
