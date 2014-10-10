@@ -1,4 +1,4 @@
-package platform;
+package no.platform;
 
 import java.util.*;
 import java.util.function.BiConsumer;

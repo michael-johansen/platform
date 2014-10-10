@@ -1,9 +1,9 @@
-package platform;
+package no.platform;
 
 import java.util.*;
 import java.util.function.BiConsumer;
 import java.util.function.Consumer;
-import java.util.function.Function;
+import java.util.stream.Collectors;
 
 /**
  * User: Michael Johansen
@@ -46,7 +46,10 @@ public class Item {
         return (T) propertyMap.get(name);
     }
     public Map<String, ?> getProperties() {
-        return Collections.unmodifiableMap(propertyMap);
+        return propertyMap.entrySet().stream()
+                .filter(e->!e.getKey().startsWith("_"))
+                .collect(Collectors.toMap(e -> e.getKey(), e -> e.getValue()));
+        //return Collections.unmodifiableMap(propertyMap);
     }
 
     public String getKey() {

@@ -1,14 +1,9 @@
 import org.junit.Before;
 import org.junit.Test;
-import platform.Item;
-import platform.Platform;
+import no.platform.Item;
+import no.platform.Platform;
 
-import java.util.HashMap;
-import java.util.Map;
 import java.util.Optional;
-import java.util.function.BiFunction;
-import java.util.function.Function;
-import java.util.stream.IntStream;
 
 import static java.util.Arrays.asList;
 import static org.hamcrest.CoreMatchers.is;

@@ -1,9 +1,9 @@
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
-import platform.Item;
-import platform.JdbcPlatform.JdbcConfigurer;
-import platform.Platform;
+import no.platform.Item;
+import no.platform.JdbcPlatform.JdbcConfigurer;
+import no.platform.Platform;
 
 import java.sql.Connection;
 import java.sql.DriverManager;
