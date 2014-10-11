@@ -1,9 +1,10 @@
+package no.platform.JdbcPlatform;
+
+import no.platform.Item;
+import no.platform.Platform;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
-import no.platform.Item;
-import no.platform.JdbcPlatform.JdbcConfigurer;
-import no.platform.Platform;
 
 import java.sql.Connection;
 import java.sql.DriverManager;
@@ -22,7 +23,8 @@ public class JdbcTest {
 
     @Before
     public void setUp() throws Exception {
-        connection = DriverManager.getConnection("jdbc:h2:mem:");
+        connection = DriverManager.getConnection("jdbc:h2:~/test;AUTO_SERVER=TRUE");
+        connection.createStatement().execute("DROP ALL OBJECTS");
     }
 
     @After
@@ -31,7 +33,7 @@ public class JdbcTest {
     }
 
     @Test
-    public void testName() throws Exception {
+    public void canSaveAndLoadItem() throws Exception {
         JdbcConfigurer persistenceConfigurer = new JdbcConfigurer(connection);
 
         Platform platformA = new Platform();
