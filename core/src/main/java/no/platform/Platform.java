@@ -12,13 +12,13 @@ import static java.util.Optional.ofNullable;
  * Date: 01.10.2014
  * Time: 18:19
  */
-public class Platform implements PersistenceConfigurer {
+public class Platform implements Storage {
     private Map<String, Type> typePropertyMap = new HashMap<>();
     private List<Consumer<Type>> onTypeRegisteredHandlers = new ArrayList<>();
     private List<Consumer<Item>> onSaveHandlers = new ArrayList<>();
     private Map<Type, Map<String, Item>> itemStorage = new HashMap<>();
-    private final Map<PersistenceConfigurer, BiFunction<Type, String, Optional<Item>>> loadHandlers = new HashMap<>();
-    private PersistenceConfigurer defaultPersistence = this;
+    private final Map<Storage, BiFunction<Type, String, Optional<Item>>> loadHandlers = new HashMap<>();
+    private Storage defaultStorage = this;
 
     public Platform() {
         configurePersistence(this);
@@ -70,11 +70,11 @@ public class Platform implements PersistenceConfigurer {
     }
 
     public Optional<Item> loadItem(String typeName, String itemKey) {
-        return loadItem(defaultPersistence, typeName, itemKey);
+        return loadItem(defaultStorage, typeName, itemKey);
     }
 
-    public Optional<Item> loadItem(PersistenceConfigurer persistenceConfigurer, String typeName, String itemKey) {
-        return Optional.ofNullable(loadHandlers.get(persistenceConfigurer))
+    public Optional<Item> loadItem(Storage storage, String typeName, String itemKey) {
+        return Optional.ofNullable(loadHandlers.get(storage))
                 .map((loadHandler) -> loadHandler.apply(typePropertyMap.get(typeName), itemKey))
                 .map(i -> i.get());
     }
@@ -84,26 +84,26 @@ public class Platform implements PersistenceConfigurer {
         itemStorage.computeIfAbsent(item.getType(), (key) -> new HashMap<>()).put(item.getKey(), item);
     }
 
-    public Platform configurePersistence(PersistenceConfigurer persistenceConfigurer) {
-        persistenceConfigurer.configurePersistence(this);
+    public Platform configureStorage(Storage storage) {
+        storage.configurePersistence(this);
         return this;
     }
 
     @Override
     public void configurePersistence(Platform platform) {
-        addLoadHandler(this, (type, id) -> loadItem(type, id));
+        addLoadHandler(this, this::loadItem);
     }
 
     private Optional<Item> loadItem(Type type, String id) {
         return ofNullable(itemStorage.get(type)).map((i) -> i.get(id));
     }
 
-    public void addLoadHandler(PersistenceConfigurer key, BiFunction<Type, String, Optional<Item>> loadHandler) {
+    public void addLoadHandler(Storage key, BiFunction<Type, String, Optional<Item>> loadHandler) {
         loadHandlers.put(key, loadHandler);
     }
 
-    public void setDefaultPersistence(PersistenceConfigurer defaultPersistence) {
-        this.defaultPersistence = defaultPersistence;
+    public void setDefaultStorage(Storage defaultStorage) {
+        this.defaultStorage = defaultStorage;
     }
 
     public class TypeBuilder {

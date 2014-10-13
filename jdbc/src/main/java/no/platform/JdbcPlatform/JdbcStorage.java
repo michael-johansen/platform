@@ -1,7 +1,7 @@
 package no.platform.JdbcPlatform;
 
 import no.platform.Item;
-import no.platform.PersistenceConfigurer;
+import no.platform.Storage;
 import no.platform.Platform;
 import no.platform.Type;
 
@@ -13,13 +13,13 @@ import static java.util.stream.Collectors.toList;
 import static no.platform.JdbcPlatform.FunctionalSqlUtils.*;
 
 /**
- * Created by Michael on 08/10/2014.
+ * This software is written by Michael on 08/10/2014.
  */
-public class JdbcConfigurer implements PersistenceConfigurer {
+public class JdbcStorage implements Storage {
     public static final String PROPERTY_DELIMETER = ", ";
     private final Connection connection;
 
-    public JdbcConfigurer(Connection connection) {
+    public JdbcStorage(Connection connection) {
         this.connection = connection;
     }
 
@@ -92,8 +92,8 @@ public class JdbcConfigurer implements PersistenceConfigurer {
 
     private String getPropertiesList(List<Map.Entry<String, Class<?>>> selectedProperties) {
         return String.join(PROPERTY_DELIMETER, selectedProperties.stream()
-                .map(entry -> entry.getKey())
-                .map(JdbcConfigurer::quote)
+                .map(Map.Entry::getKey)
+                .map(JdbcStorage::quote)
                 .collect(toList()));
     }
 

@@ -14,7 +14,7 @@ import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertThat;
 
 /**
- * Created by Michael on 08/10/2014.
+ * This software is written by Michael on 08/10/2014.
  */
 public class JdbcTest {
 
@@ -34,16 +34,16 @@ public class JdbcTest {
 
     @Test
     public void canSaveAndLoadItem() throws Exception {
-        JdbcConfigurer persistenceConfigurer = new JdbcConfigurer(connection);
+        JdbcStorage storage = new JdbcStorage(connection);
 
         Platform platformA = new Platform();
-        platformA.configurePersistence(persistenceConfigurer);
-        platformA.setDefaultPersistence(persistenceConfigurer);
+        platformA.configureStorage(storage);
+        platformA.setDefaultStorage(storage);
         platformA.addType("Person").addProperty("name", String.class).register();
 
         Platform platformB = new Platform();
-        platformB.configurePersistence(persistenceConfigurer);
-        platformB.setDefaultPersistence(persistenceConfigurer);
+        platformB.configureStorage(storage);
+        platformB.setDefaultStorage(storage);
         platformB.addType("Person").addProperty("name", String.class).apply();
 
         Item save = platformA.createItem("Person").set("name", "SomeName").save();
